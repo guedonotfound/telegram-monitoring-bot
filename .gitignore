@@ -1,0 +1,18 @@
+# Arquivos de ambiente
+.env
+
+# Ambiente virtual
+venv/
+env/
+__pycache__/
+*.pyc
+
+# Arquivos de sessão do Telethon
+*.session
+
+# VSCode settings
+.vscode/
+
+# Arquivos do sistema (Windows)
+Thumbs.db
+.DS_Store
