@@ -22,7 +22,7 @@ A Python-based Telegram bot that monitors specified channels for keywords and se
 1. Clone the repository:
 
 ```bash
-git clone [your-repo-url]
+git clone https://github.com/guedonotfound/telegram-monitoring-bot.git
 cd telegram-monitoring-bot
 ```
 
