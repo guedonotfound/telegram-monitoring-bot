@@ -45,7 +45,7 @@ async def main():
 
     except asyncio.CancelledError:
         print("\n🛑 Bot cancelado (CancelError)")
-        raise  # para permitir que o asyncio.run saiba que foi cancelado
+        raise
     except KeyboardInterrupt:
         print("\n🤖 Bot finalizado pelo usuário")
     except Exception as e:
