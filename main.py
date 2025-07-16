@@ -4,6 +4,8 @@ from dotenv import load_dotenv
 from telethon.errors import RPCError
 import asyncio
 import sys
+import ast
+import requests
 
 load_dotenv()
 
@@ -12,7 +14,21 @@ api_hash = str(os.getenv("API_HASH")) # type: ignore
 meu_id = int(os.getenv("MEU_ID")) # type: ignore
 
 palavras_chave = ["mercado livre"]
-canais = [-1001260857435, -1001836277485, -1002807632272]
+canais = ast.literal_eval(os.getenv("CANAIS")) # type: ignore
+BOT_TOKEN = os.getenv("TOKEN") # type: ignore
+CHAT_ID = os.getenv("CHAT_ID") # type: ignore
+
+required_envs = ["API_ID", "API_HASH", "MEU_ID", "CANAIS", "TOKEN", "CHAT_ID"]
+for var in required_envs:
+    if os.getenv(var) is None:
+        raise EnvironmentError(f"❌ Variável de ambiente {var} não está definida no .env")
+
+def notificar_telegram(texto: str):
+    url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
+    data = {"chat_id": CHAT_ID, "text": texto}
+    resp = requests.post(url, data=data)
+    if not resp.ok:
+        print(f"[ERRO] Falha ao enviar notificação: {resp.text}")
 
 async def main():
     try:
@@ -22,7 +38,7 @@ async def main():
                 texto = event.raw_text.lower()
                 if any(palavra in texto for palavra in palavras_chave):
                     print(f"🔔 Palavra-chave detectada em: {texto[:50]}...")
-                    await client.send_message(meu_id, f"Palavra-chave detectada:\n{event.raw_text}")
+                    notificar_telegram(f"🔔 Palavra-chave detectada:\n{event.raw_text}")
 
             print("🤖 Bot rodando...")
             await client.run_until_disconnected()
