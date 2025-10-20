@@ -14,7 +14,7 @@ api_id = int(os.getenv("API_ID"))  # type: ignore
 api_hash = str(os.getenv("API_HASH"))  # type: ignore
 meu_id = int(os.getenv("MEU_ID"))  # type: ignore
 BOT_TOKEN = os.getenv("TOKEN")  # type: ignore
-CHAT_ID = os.getenv("CHAT_ID")  # type: ignore
+CHAT_ID = int(os.getenv("CHAT_ID"))  # type: ignore
 canais = ast.literal_eval(os.getenv("CANAIS"))  # type: ignore
 KEYWORDS_FILE = "keywords.json"
 
