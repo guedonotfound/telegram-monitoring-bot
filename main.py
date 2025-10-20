@@ -45,17 +45,21 @@ async def main():
     try:
         async with TelegramClient("session_name", api_id, api_hash) as client:
 
+            # 🔹 Carrega palavras na memória
+            palavras_chave = carregar_keywords()
+
             # 📡 Monitoramento de canais
             @client.on(events.NewMessage(chats=canais))
             async def handle_message(event):
                 texto = event.raw_text.lower()
-                if any(palavra in texto for palavra in carregar_keywords()):
+                if any(palavra in texto for palavra in palavras_chave):
                     print(f"🔔 Palavra-chave detectada em: {texto[:50]}...")
                     notificar_telegram(f"🔔 Palavra-chave detectada:\n\n{event.raw_text}")
 
             # 🛠️ Comandos de gerenciamento
             @client.on(events.NewMessage)
             async def comandos_pessoais(event):
+                nonlocal palavras_chave  # permite atualizar a lista global
                 if event.sender_id != meu_id:
                     return
 
@@ -63,31 +67,32 @@ async def main():
 
                 if texto.startswith("/add "):
                     nova = texto[5:].strip()
-                    palavras = carregar_keywords()
-                    if nova in palavras:
+                    if nova in palavras_chave:
                         await event.reply(f"❗ '{nova}' já está na lista.")
                     else:
-                        palavras.append(nova)
-                        salvar_keywords(palavras)
-                        await event.reply(f"✅ Palavra '{nova}' adicionada.")
+                        palavras_chave.append(nova)
+                        salvar_keywords(palavras_chave)
+                        await event.reply(f"✅ Palavra '{nova}' adicionada e lista recarregada.")
 
                 elif texto.startswith("/remove "):
                     alvo = texto[8:].strip()
-                    palavras = carregar_keywords()
-                    if alvo in palavras:
-                        palavras.remove(alvo)
-                        salvar_keywords(palavras)
-                        await event.reply(f"🗑️ Palavra '{alvo}' removida.")
+                    if alvo in palavras_chave:
+                        palavras_chave.remove(alvo)
+                        salvar_keywords(palavras_chave)
+                        await event.reply(f"🗑️ Palavra '{alvo}' removida e lista recarregada.")
                     else:
                         await event.reply(f"❌ Palavra '{alvo}' não está na lista.")
 
                 elif texto == "/list":
-                    palavras = carregar_keywords()
-                    if palavras:
-                        lista = "\n".join(f"- {p}" for p in palavras)
+                    if palavras_chave:
+                        lista = "\n".join(f"- {p}" for p in palavras_chave)
                         await event.reply(f"📋 Palavras atuais:\n{lista}")
                     else:
                         await event.reply("📭 Nenhuma palavra cadastrada.")
+
+                elif texto == "/reload":
+                    palavras_chave = carregar_keywords()
+                    await event.reply("♻️ Lista de palavras recarregada do arquivo.")
 
             print("🤖 Bot rodando...")
             await client.run_until_disconnected()
